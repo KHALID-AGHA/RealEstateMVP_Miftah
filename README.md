@@ -1,50 +1,22 @@
-# Welcome to your Expo app 👋
+# Miftah Real Estate - Expo & Firebase MVP
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A Real estate application built with **React Native (Expo)** and **Firebase Firestore**. This project implements a full lifecycle for property listings, from geospatial data entry to advanced map visualization.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Create Property**: Dynamic form with 5 mandatory fields (Type, Price/Currency, Bedrooms, Bathrooms, and Interactive Map Location Picker).
+- **Geospatial Map View**: Powered by `react-native-maps` (Google Maps API) featuring custom markers that combine icons and price tags.
+- **Optimized Feed**: Explore screen with **Pagination (Load-on-scroll)** and Skeleton loading states for smooth performance.
+- **Real-time Sync**: Custom `useProperties` hook for instant data synchronization between Home and Map screens.
+- **Adaptive UI**: Full support for **Dark Mode** and Light Mode across all inputs, dropdowns, and components.
 
-   ```bash
-   npm install
-   ```
+## Technical Implementation
 
-2. Start the app
+### 1. No-Clipping Custom Markers
+Non-clipped markers on both iOS and Android, implemented a custom SVG rendering logic. Instead of standard image assets, markers are rendered as high-fidelity SVG components within the `Marker` children, ensuring clarity and perfect alignment of price tags and icons.
 
-   ```bash
-   npx expo start
-   ```
+### 2. Scalable Data Fetching
+- **Map/Home**: Real-time listeners via `onSnapshot` for immediate updates.
+- **Explore**: Efficient Pagination using Firestore `startAfter` and `limit` to prevent excessive data usage and maintain 60FPS scrolling.
+ 
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

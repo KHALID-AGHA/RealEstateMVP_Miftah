@@ -1,33 +1,63 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
+import React from "react";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Image } from "expo-image";
+import { Compass, Home, MapIcon, PlusSquare } from "lucide-react-native";
+import { Text, View } from "react-native";
+import { Colors } from "@/constants/theme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  const colorScheme = useColorScheme() ?? "light";
+    const theme = Colors[colorScheme];
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: theme.tint }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Miftah",
+          tabBarIcon: ({ color }) => <Home color={color} />,
+          headerTitle: () => (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image
+                source={require("../../assets/images/Miftah_logo.jpg")}
+                style={{ width: 40, height: 40, borderRadius: 6 }}
+                contentFit="contain"
+                alt="Miftah Logo"
+              />
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  marginLeft: 10,
+                  color: colorScheme === "dark" ? "#FFFFFF" : "#000000",
+                }}
+              >
+                Miftah
+              </Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Explore",
+          tabBarIcon: ({ color }) => <Compass color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Map",
+          tabBarIcon: ({ color }) => <MapIcon color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="create"
+        options={{
+          title: "Add",
+          tabBarIcon: ({ color }) => <PlusSquare color={color} />,
         }}
       />
     </Tabs>

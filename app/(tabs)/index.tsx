@@ -1,98 +1,180 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { PropertyCard } from "@/components/cards/PropertyCard";
+import { ThemedView } from "@/components/themed-view";
+import { PROPERTY_TYPES } from "@/constants/Configs";
+import { Colors } from "@/constants/theme";
+import { db } from "@/src/services/firebase";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import {
+  Search,
+  SlidersHorizontal
+} from "lucide-react-native";
+import { useEffect, useState } from "react";
+import {
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View
+} from "react-native";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [list, setList] = useState<any[]>([]);
+  const colorScheme = useColorScheme() ?? "light";
+  const theme = Colors[colorScheme];
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  useEffect(() => {
+    const q = query(collection(db, "properties"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snap) => {
+      setList(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+  }, []);
+
+  const renderItem = ({ item }: { item: any }) => (
+    <PropertyCard item={item} theme={theme} />
+  );
+
+  return (
+    <ThemedView style={styles.container}>
+      {/* Search Header */}
+      <View style={styles.searchSection}>
+        <View
+          style={[
+            styles.searchBar,
+            { backgroundColor: colorScheme === "dark" ? "#1c1e1f" : "#F1F5F9" },
+          ]}
+        >
+          <Search size={20} color={theme.icon} />
+          <TextInput
+            placeholder="Look for properties.."
+            placeholderTextColor={theme.icon}
+            style={[styles.searchInput, { color: theme.text }]}
+          />
+          <TouchableOpacity
+            style={[styles.filterBtn, { backgroundColor: theme.tint }]}
+          >
+            <SlidersHorizontal size={18} color="#FFF" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Categories Scroll */}
+      <View style={{ marginBottom: 15 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterScroll}
+        >
+          {PROPERTY_TYPES.map((filter, index) => (
+            <TouchableOpacity
+              key={filter.id}
+              style={[
+                styles.filterChip,
+                index === 0 && {
+                  backgroundColor: theme.tint,
+                  borderColor: theme.tint,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  index === 0 && { color: "#FFF" },
+                ]}
+              >
+                {filter.value}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      <FlatList
+        data={list}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listPadding}
+        showsVerticalScrollIndicator={false}
+      />
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1 },
+  searchSection: { paddingHorizontal: 20, paddingTop: 50, marginBottom: 15 },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 15,
+    borderRadius: 15,
+    height: 55,
+    gap: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  searchInput: { flex: 1, fontSize: 14 },
+  filterBtn: {
+    width: 45,
+    height: 45,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 5,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+
+  filterScroll: { paddingHorizontal: 20, gap: 10 },
+  filterChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
+  filterChipText: { fontSize: 13, fontWeight: "600", color: "#64748B" },
+
+  listPadding: { paddingHorizontal: 20, paddingBottom: 40 },
+  card: {
+    borderRadius: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  imageContainer: { width: "100%", height: 220 },
+  image: { width: "100%", height: "100%" },
+  priceTag: {
+    position: "absolute",
+    bottom: 15,
+    left: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  priceText: { color: "#FFF", fontWeight: "800", fontSize: 14 },
+  favoriteBtn: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    padding: 8,
+    borderRadius: 50,
+  },
+
+  cardContent: { padding: 16 },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  title: { fontSize: 17, fontWeight: "700" },
+  typeTag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  typeTagText: { fontSize: 10, fontWeight: "bold" },
+  locationRow: { flexDirection: "row", alignItems: "center", gap: 4 },
+  locationText: { fontSize: 13 },
+  divider: { height: 1, marginVertical: 12 },
+  infoRow: { flexDirection: "row", gap: 20 },
+  iconGroup: { flexDirection: "row", alignItems: "center", gap: 6 },
+  infoText: { fontSize: 13, fontWeight: "600" },
 });
