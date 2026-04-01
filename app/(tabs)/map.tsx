@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   Platform,
@@ -32,16 +32,6 @@ export default function MapScreen() {
     setSelectedProperty(property);
   };
 
-  const mapPadding = useMemo(
-    () =>
-      Platform.select({
-        ios: { top: 0, right: 0, bottom: 90, left: 0 },
-        android: { top: 0, right: 0, bottom: 120, left: 0 },
-        default: { top: 0, right: 0, bottom: 90, left: 0 },
-      }),
-    [],
-  );
-
   return (
     <View style={styles.container}>
       <MapView
@@ -53,7 +43,6 @@ export default function MapScreen() {
           latitudeDelta: 0.1,
           longitudeDelta: 0.1,
         }}
-        // عند الضغط على الخريطة في أي مكان فارغ، نغلق الـ Quick Preview
         onPress={() => setSelectedProperty(null)}
       >
         {properties.map((item) => (

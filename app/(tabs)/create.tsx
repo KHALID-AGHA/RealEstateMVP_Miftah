@@ -51,7 +51,7 @@ export default function CreateScreen() {
         createdAt: new Date(),
       });
 
-      Alert.alert("Success", "Listing Published!");
+      Alert.alert("Success", "Property Published!");
       setForm(initialState);
 
       router.push("/(tabs)/map");
@@ -163,7 +163,7 @@ export default function CreateScreen() {
         disabled={loading}
       >
         <Text style={styles.btnText}>
-          {loading ? "Saving..." : "Submit Listing"}
+          {loading ? "Saving..." : "Submit Property"}
         </Text>
       </TouchableOpacity>
     </ScrollView>
